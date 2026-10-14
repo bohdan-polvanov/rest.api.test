@@ -16,6 +16,7 @@ public class AssureRequest {
     private String body;
     private String proxyHost;
     private Integer proxyPort;
+    private String description;
     private Boolean sslValidation = true;
     private final RequestSpecBuilder requestSpecBuilder;
     private final Map<String, String> headers = new HashMap<>();
@@ -29,13 +30,13 @@ public class AssureRequest {
         this.requestSpecBuilder = new RequestSpecBuilder();
     }
 
-    public static AssureRequest initRequest() {
+    public static AssureRequest initApiTest() {
         return new AssureRequest();
     }
 
-    public static AssureRequest initApiTest(String description) {
-        log.info("Test case description: {}", description);
-        return new AssureRequest();
+    public AssureRequest setDescription(String description) {
+        this.description = description;
+        return this;
     }
 
     public AssureRequest disableSslValidation() {
@@ -75,7 +76,8 @@ public class AssureRequest {
     }
 
     public AssureResponse sendRequest(Method method) {
-        log.info("Building request configuration...");
+        log.info("= = = = = = = = = = = = Init API Request = = = = = = = = = = = =");
+        log.info("Test Case Description: {}", description);
 
         if (proxyHost != null && proxyPort != null) {
             requestSpecBuilder.setProxy(proxyHost, proxyPort);
@@ -123,7 +125,6 @@ public class AssureRequest {
                     .when()
                     .request(method);
 
-            log.info("Request executed successfully. Received status code: {}", response.getStatusCode());
             return new AssureResponse(response);
 
         } catch (Exception e) {
