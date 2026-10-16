@@ -1,14 +1,15 @@
 package ua.com.api;
 
 import org.slf4j.Logger;
+import java.util.Collection;
 import org.slf4j.LoggerFactory;
 import org.testng.asserts.SoftAssert;
+import ua.com.api.conditions.Condition;
 import io.restassured.response.Response;
-import static org.hamcrest.Matchers.equalTo;
 
 public class AssureResponse {
-    private final Response response;
-    private final SoftAssert softAssert;
+    protected final Response response;
+    protected final SoftAssert softAssert;
     private static final Logger log = LoggerFactory.getLogger(AssureResponse.class);
 
     public AssureResponse(Response response) {
@@ -32,54 +33,30 @@ public class AssureResponse {
         }
     }
 
-    public AssureResponse checkStatusCode(int expectedCode) {
-        try {
-            response.then().statusCode(expectedCode);
-            log.info("✅ Validation passed: Status code is {}", expectedCode);
-        } catch (AssertionError e) {
-            int actualCode = response.statusCode();
-            log.error("❌ Validation failed! Status code - Expected: [{}], but Actual: [{}]", expectedCode, actualCode);
-            // Записуємо помилку в TestNG, але код іде далі!
-            softAssert.fail(String.format("Status code mismatch: Expected [%s] but found [%s]", expectedCode, actualCode));
-        }
-        return this;
-    }
-
-    public AssureResponse checkHeader(String headerName, String expectedValue) {
-        try {
-            response.then().header(headerName, expectedValue);
-            log.info("✅ Validation passed: Header '{}' equals '{}'", headerName, expectedValue);
-        } catch (AssertionError e) {
-            String actualValue = response.header(headerName);
-            log.error("❌ Validation failed! Header '{}' - Expected: [{}], but Actual: [{}]", headerName, expectedValue, actualValue);
-            softAssert.fail(String.format("Header mismatch: '%s' expected [%s] but found [%s]", headerName, expectedValue, actualValue));
-        }
-        return this;
-    }
-
-    public AssureResponse checkJsonField(String jsonPath, Object expectedValue) {
-        try {
-            response.then().body(jsonPath, equalTo(expectedValue));
-            log.info("✅ Validation passed: JSON field '{}' equals '{}'", jsonPath, expectedValue);
-        } catch (AssertionError e) {
-            Object actualValue = response.jsonPath().get(jsonPath);
-            log.error("❌ Validation failed! JSON field '{}' - Expected: [{}], but Actual: [{}]", jsonPath, expectedValue, actualValue);
-            softAssert.fail(String.format("JSON field mismatch: '%s' expected [%s] but found [%s]", jsonPath, expectedValue, actualValue));
-        }
-        return this;
-    }
-
-    public void assertAll() {
-        softAssert.assertAll();
-    }
-
     private void logResponseBody() {
-        String responseBody = response.getBody().asPrettyString();
+        String responseBody = response.getBody().toString();
         if (responseBody != null && !responseBody.trim().isEmpty()) {
             log.info("📦 Response Body:\n{}", responseBody);
         } else {
             log.info("📦 Response Body: [Empty]");
         }
+    }
+
+    public AssureResponse shouldHave(Condition condition) {
+        condition.check(response, softAssert);
+        return assertAll();
+    }
+
+    public AssureResponse shouldHave(Collection<Condition> conditions) {
+        for (Condition condition : conditions) {
+            condition.check(response, softAssert);
+        }
+        return assertAll();
+    }
+
+    private AssureResponse assertAll() {
+        softAssert.assertAll();
+        return this;
     }
 
     public Response getResponseBody() {

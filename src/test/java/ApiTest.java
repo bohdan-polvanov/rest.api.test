@@ -1,34 +1,16 @@
+import java.util.Collection;
 import io.restassured.http.Method;
 import org.testng.annotations.Test;
-import ua.com.api.AssureRequest;
+import ua.com.api.conditions.Condition;
+import ua.com.provider.TestDataProvider;
 
-import static ua.com.api.AssureRequest.initApiTest;
-
-public class ApiTest {
-
-    private AssureRequest assureRequest = initApiTest().disableSslValidation();
-
-    @Test
-    public void initTest1() {
+public class ApiTest extends BaseApiTest{
+    @Test(dataProvider = "BASE_API_TEST", dataProviderClass = TestDataProvider.class)
+    public void initTest1(Collection<Condition> condition, String testCaseDescription) {
         assureRequest
-                .setDescription("First Test Case #1")
-                .setUrl("http://localhost:3000")
-                .setPath("order/pay")
-                .addHeader("Content-Type", "application/json")
+                .setDescription(testCaseDescription)
+                .addHeader("Content-Type", "application/json; charset=utf-8")
                 .sendRequest(Method.GET)
-                .checkStatusCode(201)
-                .assertAll();
-    }
-
-    @Test
-    public void initTest2() {
-        assureRequest
-                .setDescription("Second Test Case #2")
-                .setUrl("http://localhost:3000")
-                .setPath("order/pay")
-                .addHeader("Content-Type", "application/json")
-                .sendRequest(Method.GET)
-                .checkStatusCode(200)
-                .assertAll();
+                .shouldHave(condition);
     }
 }

@@ -1,14 +1,15 @@
 package ua.com.api;
 
-import java.util.Map;
-import org.slf4j.Logger;
-import java.util.HashMap;
-import org.json.JSONObject;
-import org.slf4j.LoggerFactory;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
-import io.restassured.builder.RequestSpecBuilder;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AssureRequest {
     private String url;
@@ -120,18 +121,12 @@ public class AssureRequest {
         log.info("Executing {} request.", method);
 
         try {
-            Response response = RestAssured.given()
-                    .spec(requestSpecBuilder.build())
-                    .when()
-                    .request(method);
-
+            Response response = RestAssured.given().spec(requestSpecBuilder.build()).when().request(method);
             return new AssureResponse(response);
-
         } catch (Exception e) {
             String errorMessage = String.format("Critical error! Failed to send %s request", method);
             log.error(errorMessage);
             log.error("Reason: {}", e.getMessage());
-
             throw new RuntimeException(errorMessage, e);
         }
     }
