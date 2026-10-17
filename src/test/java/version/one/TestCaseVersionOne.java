@@ -1,11 +1,14 @@
-import java.util.Collection;
+package version.one;
+
 import io.restassured.http.Method;
 import org.testng.annotations.Test;
 import ua.com.api.conditions.Condition;
 import ua.com.provider.TestDataProvider;
 
-public class ApiTest extends BaseApiTest{
-    @Test(dataProvider = "BASE_API_TEST", dataProviderClass = TestDataProvider.class)
+import java.util.Collection;
+
+public class TestCaseVersionOne extends BaseVersionOne {
+    @Test(dataProvider = "BASE_API_TEST_ONE", dataProviderClass = TestDataProvider.class)
     public void initTest1(Collection<Condition> condition, String testCaseDescription) {
         assureRequest
                 .setDescription(testCaseDescription)

@@ -1,10 +1,12 @@
+package version.one;
+
 import org.testng.ITest;
-import ua.com.api.AssureRequest;
 import org.testng.annotations.BeforeMethod;
+import ua.com.api.AssureRequest;
+
 import static ua.com.api.AssureRequest.initApiTest;
 
-
-public class BaseApiTest implements ITest {
+public class BaseVersionOne implements ITest {
     protected String path = "order/pay";
     protected String url = "http://localhost:3000";
 
